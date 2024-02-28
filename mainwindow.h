@@ -17,7 +17,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_loadSupervisorsButton_clicked();
+
+    void on_loadStudentsButton_clicked();
+
+    void on_loadProjectsButton_clicked();
+
+    void on_startButton_clicked();
+
 private:
+    void freeAndClearSupervisors();
+    void freeAndClearStudents();
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

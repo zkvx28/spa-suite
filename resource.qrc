@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>resource/spa-suite.png</file>
+        <file>resource/win_icon.png</file>
+    </qresource>
+</RCC>
