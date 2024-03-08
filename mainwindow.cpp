@@ -12,10 +12,13 @@
 #include <QtLogging>
 #include "spa.h"
 
+#define POPULATION_SIZE 20
+#define MAX_ITERATIONS 100
+
 QList<Supervisor*> supervisors;
-QMap<int, Supervisor*> projects; // Map project ID to supervisor
+QList<Supervisor*> projects; // Map project ID to supervisor
 QList<Student*> students;
-QHash<Student*, int> spa; // Matching of student (key) to project (value)
+int noProjects;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -85,10 +88,11 @@ void MainWindow::on_loadSupervisorsButton_clicked()
                         return;
                     }
                     list.removeFirst();
-                    QList<int> prefs;
+                    PrefsMap prefs;
                     foreach(QString n, list)
                     {
-                        if (prefs.contains(n.toInt()))
+                        QList<QString> cur = n.split(u':', Qt::SkipEmptyParts);
+                        if (prefs.contains(cur[0].toInt()))
                         {
                             QMessageBox error;
                             error.setText("Error: duplicated prefs on line "+QString::number(i));
@@ -96,7 +100,10 @@ void MainWindow::on_loadSupervisorsButton_clicked()
                             MainWindow::freeAndClearSupervisors();
                             return;
                         }
-                        prefs.append(n.toInt());
+                        if (cur[1].toInt() <= 0)
+                            prefs[cur[0].toInt()] = -1;
+                        else
+                            prefs[cur[0].toInt()] = cur[1].toInt();
                     }
                     supervisors.append(new Supervisor(id, prefs));
                 }
@@ -112,7 +119,7 @@ void MainWindow::on_loadSupervisorsButton_clicked()
             // Enable projects button now supervisors loaded
             ui->loadProjectsButton->setEnabled(true);
 
-            if (!projects.isEmpty() && students.count() > 0 && supervisors.count() > 0)
+            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
             {
                 ui->startButton->setEnabled(true);
             }
@@ -158,18 +165,22 @@ void MainWindow::on_loadStudentsButton_clicked()
                         return;
                     }
                     list.removeFirst();
-                    QList<int> prefs;
+                    PrefsMap prefs;
                     foreach(QString n, list)
                     {
-                        if (prefs.contains(n.toInt()))
+                        QList<QString> cur = n.split(u':', Qt::SkipEmptyParts);
+                        if (prefs.contains(cur[0].toInt()))
                         {
                             QMessageBox error;
-                            error.setText("Error: duplicated prefs on line "+QString::number(i));
+                            error.setText("Error: duplicated prefs on line "+QString::number(i) + " ("+QString::number(cur[0].toInt())+")");
                             error.exec();
                             MainWindow::freeAndClearStudents();
                             return;
                         }
-                        prefs.append(n.toInt());
+                        if (cur[1].toInt() <= 0)
+                            prefs[cur[0].toInt()] = -1;
+                        else
+                            prefs[cur[0].toInt()] = cur[1].toInt();
                     }
                     students.append(new Student(id, prefs));
                     prefs.clear();
@@ -183,7 +194,7 @@ void MainWindow::on_loadStudentsButton_clicked()
             fnOut.append("...");
             ui->fnStudentsLabel->setText(fnOut);
 
-            if (!projects.isEmpty() && students.count() > 0 && supervisors.count() > 0)
+            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
             {
                 ui->startButton->setEnabled(true);
             }
@@ -244,8 +255,7 @@ void MainWindow::on_loadProjectsButton_clicked()
                         projects.clear();
                         return;
                     }
-
-                    projects[i] = supervisors[supervisor];
+                    projects.append(supervisors[supervisor]);
                 }
                 i++;
             }
@@ -256,10 +266,90 @@ void MainWindow::on_loadProjectsButton_clicked()
             fnOut.append("...");
             ui->fnProjectsLabel->setText(fnOut);
 
-            if (!projects.isEmpty() && students.count() > 0 && supervisors.count() > 0)
+            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
             {
                 ui->startButton->setEnabled(true);
             }
         }
     }
+}
+
+void MainWindow::on_startButton_clicked()
+{
+    ui->startButton->setEnabled(false);
+
+    QFile out("out.txt");
+    out.open(QIODevice::WriteOnly);
+
+    out.write("=== EXECUTION BEGIN ===\n");
+
+    out.write("\n== STUDENTS LIST ==\n");
+    foreach(Student* s, students)
+    {
+        out.write("S");
+        out.write(QString::number(s->getId()).toUtf8());
+        out.write(" PROJECT PREFS: ");
+        for (int i = 0; i < projects.count(); i++)
+        {
+            out.write(QString::number(i).toUtf8());
+            out.write(":");
+            out.write(QString::number(s->getPref(i)).toUtf8());
+            out.write(" ");
+        }
+        out.write("\n");
+    }
+
+
+    out.write("\n== SUPERVISORS LIST ==\n");
+    foreach(Supervisor* v, supervisors)
+    {
+        out.write("V");
+        out.write(QString::number(v->getId()).toUtf8());
+        out.write(" STUDENT PREFS: ");
+        for (int i = 0; i < students.count(); i++)
+        {
+            out.write(QString::number(i).toUtf8());
+            out.write(":");
+            out.write(QString::number(v->getPref(i)).toUtf8());
+            out.write(" ");
+        }
+        out.write("\n");
+    }
+
+    out.write("\n== PROJECTS LIST ==\n");
+    int i = 0;
+    foreach(Supervisor* v, projects)
+    {
+        out.write("P");
+        out.write(QString::number(i).toUtf8());
+        out.write(" SUPERVISOR: ");
+        out.write(QString::number(v->getId()).toUtf8());
+        out.write("\n");
+        i++;
+    }
+
+    out.write("\n== GENERATING INITIAL POPULATION OF ");
+    out.write(QString::number(POPULATION_SIZE).toUtf8());
+    out.write(" ==\n");
+
+    SPAInstance* spa = new SPAInstance(students, projects, supervisors, POPULATION_SIZE); // Generate the SPAInstance
+
+    out.write(spa->getState().toLocal8Bit().data());
+
+    for (int i = 1; i <= MAX_ITERATIONS; i++)
+    {
+        spa->iterateSPA();
+
+        out.write("\n== POPULATION AFTER ");
+        out.write(QString::number(i).toUtf8());
+        out.write(" ITERATIONS ==\n");
+        out.write(spa->getState().toLocal8Bit().data());
+        out.write("\n");
+    }
+
+    out.write("\n=== EXECUTION COMPLETE ===\n");
+
+    out.close();
+
+    ui->startButton->setEnabled(true);
 }
