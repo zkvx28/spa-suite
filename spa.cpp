@@ -55,6 +55,8 @@ SPAInstance::SPAInstance(QList<Student*> studentSet, QList<Supervisor*> projectS
     this->supervisors = supervisorSet;
     this->projects = projectSet;
     this->popSize = popSize;
+    this->best = INT_MIN;
+    this->worst = INT_MAX;
 
     for (int i = 0; i < popSize; i++)
     {
@@ -75,10 +77,12 @@ Chromosome::Chromosome(QList<Student*> studentSet, QList<Supervisor*> projectSet
     this->matching.resize(studentSet.count(), -1);
 
     QMap<int, bool> assigned; // Project assigned?
+    bool assignable;
+    int proj;
     for (int i = 0; i < studentSet.count(); i++)
     {
         // Can we assign this student a project?
-        bool assignable = false;
+        assignable = false;
         for (int j = 0; j < projectSet.count(); j++)
         {
             if (assigned[j] == false && studentSet[i]->getPref(j) > 0 && projectSet[j]->getPref(i) > 0)
@@ -88,11 +92,10 @@ Chromosome::Chromosome(QList<Student*> studentSet, QList<Supervisor*> projectSet
         }
         if (assignable == true) // Skip if can't assign
         {
-            int proj = dist(gen);
-            while (assigned[proj] != false || studentSet[i]->getPref(proj) <= 0 || projectSet[proj]->getPref(i) <= 0)
+            do
             {
                 proj = dist(gen);
-            }
+            } while (assigned[proj] != false || studentSet[i]->getPref(proj) <= 0 || projectSet[proj]->getPref(i) <= 0);
             this->matching[i] = proj;
             assigned[proj] = true;
         }
@@ -133,22 +136,34 @@ QString Chromosome::getState(void)
 int Chromosome::fitness(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, QList<int> matching)
 {
     int fitness = 0;
-    int studentCount = studentSet.count();
-    int supervisorCount = supervisorSet.count();
-    int score = 0;
+    int solution_size = 0;
+    int s_match, v_match;
     // Loop through solution
     for (int i = 0; i < matching.count(); i++)
     {
         if (matching[i] != -1)
-        {
-            // Solution size
-            fitness += 1;
+            solution_size++;
+    }
 
+    solution_size = pow(solution_size, 1);
+
+    for (int i = 0; i < matching.count(); i++)
+    {
+        if (matching[i] != -1)
+        {
             // Student preferences
-            fitness += (studentCount / pow((studentSet[i]->getPref(matching[i])), 2));
+            s_match = studentSet[i]->getPref(matching[i]);
+            if (s_match > 0)
+            {
+                fitness += (solution_size / pow((s_match), 2));
+            }
 
             // Lecturer preferences
-            fitness += (supervisorCount / pow((projectSet[matching[i]]->getPref(i)), 2));
+            v_match = projectSet[matching[i]]->getPref(i);
+            if (v_match > 0)
+            {
+                fitness += (solution_size / pow((v_match), 2));
+            }
         }
     }
     return fitness;
@@ -164,6 +179,7 @@ void SPAInstance::iterateSPA(void)
     std::uniform_int_distribution<> distStudents(0, studentsCount-1);
     int projectsCount = this->projects.count();
     std::uniform_int_distribution<> distProjects(0, projectsCount-1);
+    std::uniform_real_distribution<> distReals(0.0, 1.0);
 
     QList<int> child1(studentsCount);
     QList<int> child2(studentsCount);
@@ -298,10 +314,10 @@ void SPAInstance::iterateSPA(void)
     }
 
     // MUTATION
-    double mutation_rate = 10 / (this->chromosomes.count() * std::sqrt(this->students.count()));
+    double mutation_rate = 1.0 / (this->chromosomes.count() * std::sqrt(this->students.count()));
     for (int i = 0; i < studentsCount; i++)
     {
-        if (gen() < mutation_rate)
+        if (distReals(gen) < mutation_rate)
         {
             do
             {
@@ -311,7 +327,7 @@ void SPAInstance::iterateSPA(void)
             child1[i] = temp;
             usageMap1[temp] = true;
         }
-        if (gen() < mutation_rate)
+        if (distReals(gen) < mutation_rate)
         {
             do
             {
@@ -332,6 +348,7 @@ void SPAInstance::iterateSPA(void)
         std::swap(child1Fitness, child2Fitness);
     }
     QList<int> fitnesses(this->chromosomes.count());
+    this->fitnesses = fitnesses;
     QList<int> fitnessesCopy(this->chromosomes.count());
     for (int i = 0; i < this->chromosomes.count(); i++)
     {
@@ -339,6 +356,8 @@ void SPAInstance::iterateSPA(void)
         fitnessesCopy[i] = this->chromosomes[i]->fitness(this->students, this->projects, this->supervisors, this->chromosomes[i]->getMatching());
     }
     std::sort(fitnesses.begin(), fitnesses.end());
+    this->best = std::max(this->best, fitnesses.back());
+    this->worst = std::min(this->worst, fitnesses.front());
     if (fitnesses[0] < child1Fitness)
     {
         int t = fitnessesCopy.indexOf(fitnesses[0]);
@@ -355,4 +374,14 @@ void SPAInstance::iterateSPA(void)
             }
         }
     }
+}
+
+int SPAInstance::bestFitness(void)
+{
+    return this->best;
+}
+
+int SPAInstance::worstFitness(void)
+{
+    return this->worst;
 }

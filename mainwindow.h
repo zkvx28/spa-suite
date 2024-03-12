@@ -26,6 +26,8 @@ private slots:
 
     void on_startButton_clicked();
 
+    void on_actionDataset_Generator_triggered();
+
 private:
     void freeAndClearSupervisors();
     void freeAndClearStudents();

@@ -26,6 +26,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resource.qrc
         spa.h
         spa.h spa.cpp
+        datagenwindow.h datagenwindow.cpp datagenwindow.ui
 
     )
 # Define target properties for Android with Qt 6 as:

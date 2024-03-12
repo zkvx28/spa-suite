@@ -112,13 +112,155 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>110</y>
+      <y>170</y>
       <width>371</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
      <string>START</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="numberIterationsLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>210</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Number of iterations</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="numberIterationsVal">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>210</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="bestFitnessLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>240</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Best fitness:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="bestFitnessVal">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>240</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="worstFitnessLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>181</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Worst fitness:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="worstFitnessVal">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>270</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="popSizeLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Population size</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="maxIterationsLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Maximum iterations</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="popSizeInput">
+    <property name="geometry">
+     <rect>
+      <x>211</x>
+      <y>110</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>8</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>50</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="maxIterationsInput">
+    <property name="geometry">
+     <rect>
+      <x>211</x>
+      <y>140</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>100000</number>
+    </property>
+    <property name="value">
+     <number>10000</number>
     </property>
    </widget>
    <zorder>loadProjectsButton</zorder>
@@ -128,6 +270,16 @@
    <zorder>fnProjectsLabel</zorder>
    <zorder>fnStudentsLabel</zorder>
    <zorder>startButton</zorder>
+   <zorder>numberIterationsLabel</zorder>
+   <zorder>numberIterationsVal</zorder>
+   <zorder>bestFitnessLabel</zorder>
+   <zorder>bestFitnessVal</zorder>
+   <zorder>worstFitnessLabel</zorder>
+   <zorder>worstFitnessVal</zorder>
+   <zorder>popSizeLabel</zorder>
+   <zorder>maxIterationsLabel</zorder>
+   <zorder>popSizeInput</zorder>
+   <zorder>maxIterationsInput</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -138,6 +290,13 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuDataset_Generator">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionDataset_Generator"/>
+   </widget>
+   <addaction name="menuDataset_Generator"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad_Dataset">
@@ -148,6 +307,14 @@
   <action name="actionLoad_Dataset_2">
    <property name="text">
     <string>Load Dataset</string>
+   </property>
+  </action>
+  <action name="actionDataset_Generator">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Dataset Generator</string>
    </property>
   </action>
  </widget>

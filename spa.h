@@ -67,12 +67,17 @@ private:
     QList<Supervisor*> projects;
     QList<Supervisor*> supervisors;
     QList<Chromosome*> chromosomes;
+    QList<int> fitnesses;
+    int best;
+    int worst;
     int popSize;
 public:
     QList<Chromosome*>& getChromosomes(void);
     QString getState(void);
     SPAInstance(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, int popSize);
     void iterateSPA(void);
+    int bestFitness(void);
+    int worstFitness(void);
 };
 
 #endif // SPA_H

@@ -11,9 +11,8 @@
 #include <QErrorMessage>
 #include <QtLogging>
 #include "spa.h"
-
-#define POPULATION_SIZE 20
-#define MAX_ITERATIONS 100
+#include "datagenwindow.h"
+#include "./ui_datagenwindow.h"
 
 QList<Supervisor*> supervisors;
 QList<Supervisor*> projects; // Map project ID to supervisor
@@ -278,78 +277,96 @@ void MainWindow::on_startButton_clicked()
 {
     ui->startButton->setEnabled(false);
 
-    QFile out("out.txt");
-    out.open(QIODevice::WriteOnly);
+    //QFile out("out.txt");
+    //out.open(QIODevice::WriteOnly);
 
-    out.write("=== EXECUTION BEGIN ===\n");
+    //out.write("=== EXECUTION BEGIN ===\n");
 
-    out.write("\n== STUDENTS LIST ==\n");
+    //out.write("\n== STUDENTS LIST ==\n");
     foreach(Student* s, students)
     {
-        out.write("S");
-        out.write(QString::number(s->getId()).toUtf8());
-        out.write(" PROJECT PREFS: ");
+        //out.write("S");
+        //out.write(QString::number(s->getId()).toUtf8());
+        //out.write(" PROJECT PREFS: ");
         for (int i = 0; i < projects.count(); i++)
         {
-            out.write(QString::number(i).toUtf8());
-            out.write(":");
-            out.write(QString::number(s->getPref(i)).toUtf8());
-            out.write(" ");
+            //out.write(QString::number(i).toUtf8());
+            //out.write(":");
+            //out.write(QString::number(s->getPref(i)).toUtf8());
+            //out.write(" ");
         }
-        out.write("\n");
+        //out.write("\n");
     }
 
 
-    out.write("\n== SUPERVISORS LIST ==\n");
+    //out.write("\n== SUPERVISORS LIST ==\n");
     foreach(Supervisor* v, supervisors)
     {
-        out.write("V");
-        out.write(QString::number(v->getId()).toUtf8());
-        out.write(" STUDENT PREFS: ");
+        //out.write("V");
+        //out.write(QString::number(v->getId()).toUtf8());
+        //out.write(" STUDENT PREFS: ");
         for (int i = 0; i < students.count(); i++)
         {
-            out.write(QString::number(i).toUtf8());
-            out.write(":");
-            out.write(QString::number(v->getPref(i)).toUtf8());
-            out.write(" ");
+            //out.write(QString::number(i).toUtf8());
+            //out.write(":");
+            //out.write(QString::number(v->getPref(i)).toUtf8());
+            //out.write(" ");
         }
-        out.write("\n");
+        //out.write("\n");
     }
 
-    out.write("\n== PROJECTS LIST ==\n");
+    //out.write("\n== PROJECTS LIST ==\n");
     int i = 0;
     foreach(Supervisor* v, projects)
     {
-        out.write("P");
-        out.write(QString::number(i).toUtf8());
-        out.write(" SUPERVISOR: ");
-        out.write(QString::number(v->getId()).toUtf8());
-        out.write("\n");
+        //out.write("P");
+        //out.write(QString::number(i).toUtf8());
+        //out.write(" SUPERVISOR: ");
+        //out.write(QString::number(v->getId()).toUtf8());
+        //out.write("\n");
         i++;
     }
 
-    out.write("\n== GENERATING INITIAL POPULATION OF ");
-    out.write(QString::number(POPULATION_SIZE).toUtf8());
-    out.write(" ==\n");
+    //out.write("\n== GENERATING INITIAL POPULATION OF ");
+    //out.write(QString::number(ui->popSizeInput->value()).toUtf8());
+    //out.write(" ==\n");
 
-    SPAInstance* spa = new SPAInstance(students, projects, supervisors, POPULATION_SIZE); // Generate the SPAInstance
+    SPAInstance* spa = new SPAInstance(students, projects, supervisors, ui->popSizeInput->value()); // Generate the SPAInstance
 
-    out.write(spa->getState().toLocal8Bit().data());
+    //out.write(spa->getState().toLocal8Bit().data());
 
-    for (int i = 1; i <= MAX_ITERATIONS; i++)
+    int best = 0;
+    int worst = INT_MAX;
+
+    for (int i = 1; i <= ui->maxIterationsInput->value(); i++)
     {
+        ui->numberIterationsVal->setText(QString::number(i));
+
         spa->iterateSPA();
 
-        out.write("\n== POPULATION AFTER ");
-        out.write(QString::number(i).toUtf8());
-        out.write(" ITERATIONS ==\n");
-        out.write(spa->getState().toLocal8Bit().data());
-        out.write("\n");
+        best = std::max(best, spa->bestFitness());
+        worst = std::min(worst, spa->worstFitness());
+
+        ui->worstFitnessVal->setText(QString::number(worst));
+        ui->bestFitnessVal->setText(QString::number(best));
+
+        //out.write("\n== POPULATION AFTER ");
+        //out.write(QString::number(i).toUtf8());
+        //out.write(" ITERATIONS ==\n");
+        //out.write(spa->getState().toLocal8Bit().data());
+        //out.write("\n");
     }
 
-    out.write("\n=== EXECUTION COMPLETE ===\n");
+    //out.write("\n=== EXECUTION COMPLETE ===\n");
 
-    out.close();
+    //out.close();
 
     ui->startButton->setEnabled(true);
 }
+
+void MainWindow::on_actionDataset_Generator_triggered()
+{
+    auto win = new DataGenWindow();
+    win->show();
+}
+
