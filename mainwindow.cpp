@@ -277,10 +277,10 @@ void MainWindow::on_startButton_clicked()
 {
     ui->startButton->setEnabled(false);
 
-    //QFile out("out.txt");
-    //out.open(QIODevice::WriteOnly);
+    QFile out("out.txt");
+    out.open(QIODevice::WriteOnly);
 
-    //out.write("=== EXECUTION BEGIN ===\n");
+    out.write("=== EXECUTION BEGIN ===\n");
 
     //out.write("\n== STUDENTS LIST ==\n");
     foreach(Student* s, students)
@@ -350,16 +350,16 @@ void MainWindow::on_startButton_clicked()
         ui->worstFitnessVal->setText(QString::number(worst));
         ui->bestFitnessVal->setText(QString::number(best));
 
-        //out.write("\n== POPULATION AFTER ");
-        //out.write(QString::number(i).toUtf8());
-        //out.write(" ITERATIONS ==\n");
-        //out.write(spa->getState().toLocal8Bit().data());
-        //out.write("\n");
+        out.write("\n== POPULATION AFTER ");
+        out.write(QString::number(i).toUtf8());
+        out.write(" ITERATIONS ==\n");
+        out.write(spa->getState().toLocal8Bit().data());
+        out.write("\n");
     }
 
-    //out.write("\n=== EXECUTION COMPLETE ===\n");
+    out.write("\n=== EXECUTION COMPLETE ===\n");
 
-    //out.close();
+    out.close();
 
     ui->startButton->setEnabled(true);
 }

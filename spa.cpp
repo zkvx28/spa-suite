@@ -113,6 +113,10 @@ QString SPAInstance::getState(void)
     {
         ret.append("C");
         ret.append(QString::number(i));
+        if (this->chromosomes[i]->stable(students, projects))
+        {
+            ret.append("*");
+        }
         ret.append(" (fitness ");
         ret.append(QString::number(this->chromosomes[i]->fitness(this->students, this->projects, this->supervisors, this->chromosomes[i]->getMatching())));
         ret.append("): ");
@@ -385,3 +389,9 @@ int SPAInstance::worstFitness(void)
 {
     return this->worst;
 }
+
+bool Chromosome::stable(QList<Student*> studentSet, QList<Supervisor*> projectSet)
+{
+    return true;
+}
+

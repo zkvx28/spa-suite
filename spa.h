@@ -32,6 +32,7 @@ private:
 public:
     int getId(void);
     int getPref(int project);
+    QList<int> getGreaterPrefs(int project);
     Student(int id, PrefsMap prefs);
 };
 
@@ -57,6 +58,7 @@ public:
     void setProject(int student, int project);
     int fitness(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, QList<int> matching);
     QString getState(void);
+    bool stable(QList<Student*> studentSet, QList<Supervisor*> projectSet);
     Chromosome(QList<Student*> studentSet, QList<Supervisor*> projectSet);
 };
 
