@@ -18,15 +18,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_loadSupervisorsButton_clicked();
-
-    void on_loadStudentsButton_clicked();
-
-    void on_loadProjectsButton_clicked();
-
     void on_startButton_clicked();
 
     void on_actionDataset_Generator_triggered();
+
+    void on_cooperStartButton_clicked();
+
+    int getAssignableStudent(QList<int>, QList<int>);
+
+    void on_loadDatasetButton_clicked();
+
+    bool validateDataset(QString datasetPath);
 
 private:
     void freeAndClearSupervisors();

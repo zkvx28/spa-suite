@@ -24,87 +24,6 @@
     <normaloff>:/resources/resource/win_icon.png</normaloff>:/resources/resource/win_icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="loadSupervisorsButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Supervisors</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="loadProjectsButton">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Projects</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="loadStudentsButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Students</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="fnSupervisorsLabel">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>40</y>
-      <width>241</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>No file loaded</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="fnProjectsLabel">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>70</y>
-      <width>241</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>No file loaded</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="fnStudentsLabel">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>10</y>
-      <width>241</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>No file loaded</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="startButton">
     <property name="enabled">
      <bool>false</bool>
@@ -112,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>170</y>
+      <y>100</y>
       <width>371</width>
       <height>24</height>
      </rect>
@@ -125,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
+      <y>130</y>
       <width>181</width>
       <height>16</height>
      </rect>
@@ -138,7 +57,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>210</y>
+      <y>130</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -151,7 +70,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>160</y>
       <width>181</width>
       <height>16</height>
      </rect>
@@ -164,7 +83,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>240</y>
+      <y>160</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -177,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>270</y>
+      <y>190</y>
       <width>181</width>
       <height>16</height>
      </rect>
@@ -190,7 +109,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>270</y>
+      <y>190</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -203,7 +122,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>110</y>
+      <y>40</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -216,7 +135,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>70</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -229,7 +148,7 @@
     <property name="geometry">
      <rect>
       <x>211</x>
-      <y>110</y>
+      <y>40</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -248,7 +167,7 @@
     <property name="geometry">
      <rect>
       <x>211</x>
-      <y>140</y>
+      <y>70</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -263,23 +182,45 @@
      <number>10000</number>
     </property>
    </widget>
-   <zorder>loadProjectsButton</zorder>
-   <zorder>loadSupervisorsButton</zorder>
-   <zorder>loadStudentsButton</zorder>
-   <zorder>fnSupervisorsLabel</zorder>
-   <zorder>fnProjectsLabel</zorder>
-   <zorder>fnStudentsLabel</zorder>
-   <zorder>startButton</zorder>
-   <zorder>numberIterationsLabel</zorder>
-   <zorder>numberIterationsVal</zorder>
-   <zorder>bestFitnessLabel</zorder>
-   <zorder>bestFitnessVal</zorder>
-   <zorder>worstFitnessLabel</zorder>
-   <zorder>worstFitnessVal</zorder>
-   <zorder>popSizeLabel</zorder>
-   <zorder>maxIterationsLabel</zorder>
-   <zorder>popSizeInput</zorder>
-   <zorder>maxIterationsInput</zorder>
+   <widget class="QPushButton" name="cooperStartButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>300</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>3/2 Approx.</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadDatasetButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Dataset</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fnDatasetLabel">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>231</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>No file loaded</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

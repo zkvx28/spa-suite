@@ -1,22 +1,33 @@
 #include "spa.h"
 #include <random>
 #include <chrono>
+#include <QFile>
 
-Supervisor::Supervisor(int id, PrefsMap prefs)
+// SUPERVISOR
+
+Supervisor::Supervisor(int id, PrefsMap prefs, int capacity)
 {
     this->id = id;
     this->prefs = prefs;
+    this->capacity = capacity;
 }
 
 int Supervisor::getId()
 {
-    return this->id;
+    return id;
+}
+
+int Supervisor::getCapacity()
+{
+    return capacity;
 }
 
 int Supervisor::getPref(int student)
 {
-    return this->prefs[student];
+    return prefs[student];
 }
+
+// STUDENT
 
 Student::Student(int id, PrefsMap prefs)
 {
@@ -26,118 +37,56 @@ Student::Student(int id, PrefsMap prefs)
 
 int Student::getId()
 {
-    return this->id;
+    return id;
 }
 
 int Student::getPref(int project)
 {
-    return this->prefs[project];
+    return prefs[project];
 }
 
-int Chromosome::getProject(int student)
+// PROJECT
+
+Project::Project(int id, Supervisor* supervisor, int capacity)
 {
-    return this->matching[student];
+    this->id = id;
+    this->supervisor = supervisor;
+    this->capacity = capacity;
 }
 
-void Chromosome::setProject(int student, int project)
+Supervisor* Project::getSupervisor()
 {
-    this->matching[student] = project;
+    return supervisor;
 }
 
-QList<Chromosome *> &SPAInstance::getChromosomes()
+int Project::getCapacity()
 {
-    return this->chromosomes;
+    return capacity;
 }
 
-SPAInstance::SPAInstance(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, int popSize)
-{
-    this->students = studentSet;
-    this->supervisors = supervisorSet;
-    this->projects = projectSet;
-    this->popSize = popSize;
-    this->best = INT_MIN;
-    this->worst = INT_MAX;
+// GAINSTANCE
 
-    for (int i = 0; i < popSize; i++)
-    {
-        this->chromosomes.push_back(new Chromosome(studentSet, projectSet));
-    }
-}
-
-QList<int> Chromosome::getMatching()
-{
-    return this->matching;
-}
-
-Chromosome::Chromosome(QList<Student*> studentSet, QList<Supervisor*> projectSet)
-{
-    std::mt19937 gen(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
-    std::uniform_int_distribution<> dist(0, projectSet.count()-1);
-
-    this->matching.resize(studentSet.count(), -1);
-
-    QMap<int, bool> assigned; // Project assigned?
-    bool assignable;
-    int proj;
-    for (int i = 0; i < studentSet.count(); i++)
-    {
-        // Can we assign this student a project?
-        assignable = false;
-        for (int j = 0; j < projectSet.count(); j++)
-        {
-            if (assigned[j] == false && studentSet[i]->getPref(j) > 0 && projectSet[j]->getPref(i) > 0)
-            {
-                assignable = true;
-            }
-        }
-        if (assignable == true) // Skip if can't assign
-        {
-            do
-            {
-                proj = dist(gen);
-            } while (assigned[proj] != false || studentSet[i]->getPref(proj) <= 0 || projectSet[proj]->getPref(i) <= 0);
-            this->matching[i] = proj;
-            assigned[proj] = true;
-        }
-        else
-        {
-            this->matching[i] = -1;
-        }
-    }
-}
-
-QString SPAInstance::getState(void)
+QString GAInstance::getState(void)
 {
     QString ret = "";
-    for (int i = 0; i < this->popSize; i++)
+    for (int i = 0; i < chromosomes.count(); i++)
     {
         ret.append("C");
         ret.append(QString::number(i));
-        if (this->chromosomes[i]->stable(students, projects))
-        {
-            ret.append("*");
-        }
         ret.append(" (fitness ");
-        ret.append(QString::number(this->chromosomes[i]->fitness(this->students, this->projects, this->supervisors, this->chromosomes[i]->getMatching())));
+        ret.append(QString::number(fitness(chromosomes[i])));
         ret.append("): ");
-        ret.append(this->chromosomes[i]->getState());
+        for (int j = 0; i < chromosomes[i].count(); i++)
+        {
+            ret.append(QString::number(chromosomes[i][j]));
+            ret.append(" ");
+        }
         ret.append("\n");
     }
     return ret;
 }
 
-QString Chromosome::getState(void)
-{
-    QString ret = "";
-    for (int i = 0; i < this->matching.count(); i++)
-    {
-        ret.append(QString::number(this->matching[i]));
-        ret.append(" ");
-    }
-    return ret;
-}
-
-int Chromosome::fitness(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, QList<int> matching)
+int GAInstance::fitness(QList<int> matching)
 {
     int fitness = 0;
     int solution_size = 0;
@@ -156,14 +105,14 @@ int Chromosome::fitness(QList<Student*> studentSet, QList<Supervisor*> projectSe
         if (matching[i] != -1)
         {
             // Student preferences
-            s_match = studentSet[i]->getPref(matching[i]);
+            s_match = students[i]->getPref(matching[i]);
             if (s_match > 0)
             {
                 fitness += (solution_size / pow((s_match), 2));
             }
 
             // Lecturer preferences
-            v_match = projectSet[matching[i]]->getPref(i);
+            v_match = projects[matching[i]]->getSupervisor()->getPref(i);
             if (v_match > 0)
             {
                 fitness += (solution_size / pow((v_match), 2));
@@ -173,22 +122,24 @@ int Chromosome::fitness(QList<Student*> studentSet, QList<Supervisor*> projectSe
     return fitness;
 }
 
-void SPAInstance::iterateSPA(void)
+// GAINSTANCE
+
+void GAInstance::iterateSPA(void)
 {
     std::mt19937 gen(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
-    std::uniform_int_distribution<> dist(0, this->chromosomes.count()-1);
+    std::uniform_int_distribution<> dist(0, chromosomes.count()-1);
 
-    int studentsCount = this->students.count();
+    int studentsCount = students.count();
     std::uniform_int_distribution<> distStudents(0, studentsCount-1);
-    int projectsCount = this->projects.count();
+    int projectsCount = projects.count();
     std::uniform_int_distribution<> distProjects(0, projectsCount-1);
     std::uniform_real_distribution<> distReals(0.0, 1.0);
 
     QList<int> child1(studentsCount);
     QList<int> child2(studentsCount);
-    Chromosome* mother;
-    Chromosome* father;
+    QList<int> mother;
+    QList<int> father;
 
     // SELECTION
 
@@ -201,15 +152,14 @@ void SPAInstance::iterateSPA(void)
         b = dist(gen);
     } while (b == a);
 
-    if (this->chromosomes[a]->fitness(this->students, this->projects, this->supervisors, chromosomes[a]->getMatching()) >=
-        this->chromosomes[b]->fitness(this->students, this->projects, this->supervisors, chromosomes[b]->getMatching()))
+    if (fitness(chromosomes[a]) >= fitness(chromosomes[b]))
     {
-        mother = this->chromosomes[a];
+        mother = chromosomes[a];
         used = a;
     }
     else
     {
-        mother = this->chromosomes[b];
+        mother = chromosomes[b];
         used = b;
     }
 
@@ -223,14 +173,13 @@ void SPAInstance::iterateSPA(void)
     {
         b = dist(gen);
     }
-    if (this->chromosomes[a]->fitness(this->students, this->projects, this->supervisors, chromosomes[a]->getMatching()) >=
-        this->chromosomes[b]->fitness(this->students, this->projects, this->supervisors, chromosomes[b]->getMatching()))
+    if (fitness(chromosomes[a]) >= fitness(chromosomes[b]))
     {
-        father = this->chromosomes[a];
+        father = chromosomes[a];
     }
     else
     {
-        father = this->chromosomes[b];
+        father = chromosomes[b];
     }
 
     // CROSSOVER
@@ -246,8 +195,8 @@ void SPAInstance::iterateSPA(void)
     int temp;
     int origin1Proj;
     int origin2Proj;
-    Chromosome* origin1;
-    Chromosome* origin2;
+    QList<int> origin1;
+    QList<int> origin2;
     for (int i = 0; i < studentsCount; i++)
     {
         if (i <= crosspoint1 || i >= crosspoint2)
@@ -261,8 +210,8 @@ void SPAInstance::iterateSPA(void)
             origin2 = mother;
         }
 
-        origin1Proj = origin1->getProject(i);
-        origin2Proj = origin2->getProject(i);
+        origin1Proj = origin1[i];
+        origin2Proj = origin2[i];
 
         // child 1
         if (usageMap1[origin1Proj] == false)
@@ -344,8 +293,8 @@ void SPAInstance::iterateSPA(void)
     }
 
     // REPLACEMENT
-    int child1Fitness = mother->fitness(this->students, this->projects, this->supervisors, child1);
-    int child2Fitness = mother->fitness(this->students, this->projects, this->supervisors, child2);
+    int child1Fitness = fitness(child1);
+    int child2Fitness = fitness(child2);
     if (child2Fitness > child1Fitness)
     {
         std::swap(child1, child2);
@@ -356,8 +305,8 @@ void SPAInstance::iterateSPA(void)
     QList<int> fitnessesCopy(this->chromosomes.count());
     for (int i = 0; i < this->chromosomes.count(); i++)
     {
-        fitnesses[i] = this->chromosomes[i]->fitness(this->students, this->projects, this->supervisors, this->chromosomes[i]->getMatching());
-        fitnessesCopy[i] = this->chromosomes[i]->fitness(this->students, this->projects, this->supervisors, this->chromosomes[i]->getMatching());
+        fitnesses[i] = fitness(chromosomes[i]);
+        fitnessesCopy[i] = fitnesses[i];
     }
     std::sort(fitnesses.begin(), fitnesses.end());
     this->best = std::max(this->best, fitnesses.back());
@@ -367,31 +316,86 @@ void SPAInstance::iterateSPA(void)
         int t = fitnessesCopy.indexOf(fitnesses[0]);
         for (int i = 0; i < studentsCount; i++)
         {
-            this->chromosomes[t]->setProject(i, child1[i]);
+            this->chromosomes[t][i] = child1[i];
         }
         if (fitnesses[1] < child2Fitness)
         {
             t = fitnessesCopy.indexOf(fitnesses[1]);
             for (int i = 0; i < studentsCount; i++)
             {
-                this->chromosomes[t]->setProject(i, child2[i]);
+                this->chromosomes[t][i] = child2[i];
             }
         }
     }
 }
 
-int SPAInstance::bestFitness(void)
+int GAInstance::bestFitness(void)
 {
     return this->best;
 }
 
-int SPAInstance::worstFitness(void)
+int GAInstance::worstFitness(void)
 {
     return this->worst;
 }
 
-bool Chromosome::stable(QList<Student*> studentSet, QList<Supervisor*> projectSet)
+GAInstance::GAInstance(QFile* data, int size)
 {
-    return true;
+    // First initialise dataset-independent values
+
+    best = INT_MIN;
+    worst = INT_MAX;
+
+    // Parse the input file to create student/supervisor/project sets
+
+    QStringList list = QString(data->readLine()).split(u' ', Qt::SkipEmptyParts);
+
+    int studentCount = list[0].toInt();
+    int supervisorCount = list[1].toInt();
+    int projectCount = list[2].toInt();
+
+    students = QList<Student*>(studentCount);
+    supervisors = QList<Supervisor*>(supervisorCount);
+    projects = QList<Project*>(projectCount);
+
+    // Done making the student/supervisor/project sets, now initialise the chromosomes
+
+    std::mt19937 gen(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+    std::uniform_int_distribution<> dist(0, projects.count()-1);
+
+    for (int i = 0; i < size; i++)
+    {
+        QList<int> chromosome = QList<int>(students.count());
+
+        QMap<int, bool> assigned; // Project assigned?
+        bool assignable;
+        int proj;
+        for (int i = 0; i < students.count(); i++)
+        {
+            // Can we assign this student a project?
+            assignable = false;
+            for (int j = 0; j < projects.count(); j++)
+            {
+                if (assigned[j] == false && students[i]->getPref(j) > 0 && projects[j]->getSupervisor()->getPref(i) > 0)
+                {
+                    assignable = true;
+                }
+            }
+            if (assignable == true) // Skip if can't assign
+            {
+                do
+                {
+                    proj = dist(gen);
+                } while (assigned[proj] != false || students[i]->getPref(proj) <= 0 || projects[proj]->getSupervisor()->getPref(i) <= 0);
+                chromosome[i] = proj;
+                assigned[proj] = true;
+            }
+            else
+            {
+                chromosome[i] = -1;
+            }
+        }
+        chromosomes.push_back(chromosome);
+    }
 }
 

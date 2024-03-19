@@ -41,15 +41,23 @@ void DataGenWindow::on_pushButton_clicked()
     std::mt19937 gen(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
     std::uniform_int_distribution<> distSupervisors(0, supervisors-1);
     std::uniform_real_distribution<> distReals(0.0, 1.0);
+    std::uniform_int_distribution<> distCapacities(1, ui->maxCapacityVal->value());
 
     // Select save location
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Students Dataset"),
-                                                    "students.txt",
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Dataset"),
+                                                    "dataset.txt",
                                                     tr("Text Files (*.txt)"));
 
-    QFile outS(fileName);
-    if (!outS.open(QIODevice::WriteOnly | QIODevice::Text))
+    QFile out(fileName);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
+
+    out.write(QString::number(students).toUtf8());
+    out.write(" ");
+    out.write(QString::number(supervisors).toUtf8());
+    out.write(" ");
+    out.write(QString::number(projects).toUtf8());
+    out.write("\n");
 
     int pref = 1; // Start with first-choice
 
@@ -70,15 +78,15 @@ void DataGenWindow::on_pushButton_clicked()
     {
         std::random_shuffle(tempProjects.begin(), tempProjects.end());
 
-        outS.write(QString::number(i).toUtf8());
+        out.write(QString::number(i+1).toUtf8());
         for (int j = 0; j < projects; j++)
         {
             if (distReals(gen) >= incomplete) // skip assignment if lower than incomplete rate
             {
-                outS.write(" ");
-                outS.write(QString::number(tempProjects[j]).toUtf8());
-                outS.write(":");
-                outS.write(QString::number(pref).toUtf8());
+                out.write(" ");
+                out.write(QString::number(tempProjects[j]+1).toUtf8());
+                out.write(":");
+                out.write(QString::number(pref).toUtf8());
 
                 if (distReals(gen) >= ties)
                 {
@@ -86,35 +94,26 @@ void DataGenWindow::on_pushButton_clicked()
                 }
             }
         }
-        outS.write("\n");
+        out.write("\n");
         pref = 1;
     }
-
-    outS.close();
-
-    // Select save location
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Supervisors Dataset"),
-                                                    "supervisors.txt",
-                                                    tr("Text Files (*.txt)"));
-
-    QFile outV(fileName);
-    if (!outV.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
 
     // Build supervisors
     for (int i = 0; i < supervisors; i++)
     {
         std::random_shuffle(tempStudents.begin(), tempStudents.end());
 
-        outV.write(QString::number(i).toUtf8());
+        out.write(QString::number(i+1).toUtf8());
+        out.write(":");
+        out.write(QString::number(distCapacities(gen)).toUtf8());
         for (int j = 0; j < students; j++)
         {
             if (distReals(gen) >= incomplete) // skip assignment if lower than incomplete rate
             {
-                outV.write(" ");
-                outV.write(QString::number(tempStudents[j]).toUtf8());
-                outV.write(":");
-                outV.write(QString::number(pref).toUtf8());
+                out.write(" ");
+                out.write(QString::number(tempStudents[j]+1).toUtf8());
+                out.write(":");
+                out.write(QString::number(pref).toUtf8());
 
                 if (distReals(gen) >= ties)
                 {
@@ -122,31 +121,22 @@ void DataGenWindow::on_pushButton_clicked()
                 }
             }
         }
-        outV.write("\n");
+        out.write("\n");
         pref = 1;
     }
-
-    outV.close();
-
-    // Select save location
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Projects Dataset"),
-                                            "projects.txt",
-                                            tr("Text Files (*.txt)"));
-
-    QFile outP(fileName);
-    if (!outP.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
 
     // Build projects
     for (int i = 0; i < projects; i++)
     {
-        outP.write(QString::number(i).toUtf8());
-        outP.write(" ");
-        outP.write(QString::number(distSupervisors(gen)).toUtf8());
-        outP.write("\n");
+        out.write(QString::number(i+1).toUtf8());
+        out.write(":");
+        out.write(QString::number(distCapacities(gen)).toUtf8());
+        out.write(" ");
+        out.write(QString::number(distSupervisors(gen)+1).toUtf8());
+        out.write("\n");
     }
 
-    outP.close();
+    out.close();
 
 
     QMessageBox msg;

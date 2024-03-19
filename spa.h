@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QFile>
 #include <random>
 
 class PrefsMap : public QMap<int, int> {
@@ -17,11 +18,13 @@ class Supervisor
 {
 private:
     int id;
+    int capacity;
     PrefsMap prefs;
 public:
     int getId(void);
+    int getCapacity(void);
     int getPref(int student);
-    Supervisor(int id, PrefsMap prefs);
+    Supervisor(int id, PrefsMap prefs, int capacity);
 };
 
 class Student
@@ -40,46 +43,33 @@ class Project
 {
 private:
     int id;
+    int capacity;
     Supervisor* supervisor;
 public:
     int getId(void);
+    int getCapacity(void);
     Supervisor* getSupervisor(void);
     Project(void);
-    Project(int id, Supervisor* supervisor);
+    Project(int id, Supervisor* supervisor, int capacity);
 };
 
-class Chromosome
-{
-private:
-    QList<int> matching;
-public:
-    QList<int> getMatching(void);
-    int getProject(int student);
-    void setProject(int student, int project);
-    int fitness(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, QList<int> matching);
-    QString getState(void);
-    bool stable(QList<Student*> studentSet, QList<Supervisor*> projectSet);
-    Chromosome(QList<Student*> studentSet, QList<Supervisor*> projectSet);
-};
-
-class SPAInstance
+class GAInstance
 {
 private:
     QList<Student*> students;
-    QList<Supervisor*> projects;
+    QList<Project*> projects;
     QList<Supervisor*> supervisors;
-    QList<Chromosome*> chromosomes;
+    QList<QList<int>> chromosomes;
     QList<int> fitnesses;
     int best;
     int worst;
-    int popSize;
 public:
-    QList<Chromosome*>& getChromosomes(void);
     QString getState(void);
-    SPAInstance(QList<Student*> studentSet, QList<Supervisor*> projectSet, QList<Supervisor*> supervisorSet, int popSize);
     void iterateSPA(void);
     int bestFitness(void);
     int worstFitness(void);
+    GAInstance(QFile* data, int);
+    int fitness(QList<int> matching);
 };
 
 #endif // SPA_H
