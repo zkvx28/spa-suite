@@ -77,6 +77,7 @@ void DataGenWindow::on_pushButton_clicked()
     for (int i = 0; i < students; i++)
     {
         std::random_shuffle(tempProjects.begin(), tempProjects.end());
+        int count = 0;
 
         out.write(QString::number(i+1).toUtf8());
         for (int j = 0; j < projects; j++)
@@ -88,9 +89,11 @@ void DataGenWindow::on_pushButton_clicked()
                 out.write(":");
                 out.write(QString::number(pref).toUtf8());
 
+                count++;
                 if (distReals(gen) >= ties)
                 {
-                    pref++;
+                    pref = pref + count;
+                    count = 0;
                 }
             }
         }
@@ -102,6 +105,8 @@ void DataGenWindow::on_pushButton_clicked()
     for (int i = 0; i < supervisors; i++)
     {
         std::random_shuffle(tempStudents.begin(), tempStudents.end());
+
+        int count = 0;
 
         out.write(QString::number(i+1).toUtf8());
         out.write(":");
@@ -115,9 +120,11 @@ void DataGenWindow::on_pushButton_clicked()
                 out.write(":");
                 out.write(QString::number(pref).toUtf8());
 
+                count++;
                 if (distReals(gen) >= ties)
                 {
-                    pref++;
+                    pref = pref + count;
+                    count = 0;
                 }
             }
         }

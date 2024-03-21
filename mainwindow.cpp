@@ -381,27 +381,25 @@ bool MainWindow::validateDataset(QString datasetPath)
         }
         list.pop_front();
         // Now check the preferences
-        int lowestRank = 1;
-        int temp = 0;
+        int tieRank = -1;
+        int newRank = 1;
         foreach(QString x, list)
         {
             QStringList pref = x.split(u':', Qt::SkipEmptyParts);
             int prefProj = pref[0].toInt();
             int prefRank = pref[1].toInt();
-            if (prefRank == lowestRank)
-                temp++;
-            if (prefRank == lowestRank + temp)
-            {
-                lowestRank = lowestRank + temp;
-                temp = 0;
-            }
-            if (prefProj <= 0 || prefProj > studentCount || prefRank <= 0 || prefRank > lowestRank)
+            if (prefProj <= 0 || prefProj > projectCount || prefRank <= 0 || (prefRank != tieRank && prefRank != newRank))
             {
                 error.setText("Student "+QString::number(index)+" has an invalid preference");
                 error.exec();
                 data.close();
                 return false;
             }
+            if (prefRank != tieRank)
+            {
+                tieRank = newRank;
+            }
+            newRank++;
         }
     }
 
@@ -427,27 +425,25 @@ bool MainWindow::validateDataset(QString datasetPath)
         }
         list.pop_front();
         // Now check the preferences
-        int lowestRank = 1;
-        int temp = 0;
+        int tieRank = -1;
+        int newRank = 1;
         foreach(QString x, list)
         {
             QStringList pref = x.split(u':', Qt::SkipEmptyParts);
-            int prefProj = pref[0].toInt();
+            int prefStud = pref[0].toInt();
             int prefRank = pref[1].toInt();
-            if (prefRank == lowestRank)
-                temp++;
-            if (prefRank == lowestRank + temp)
-            {
-                lowestRank = lowestRank + temp;
-                temp = 0;
-            }
-            if (prefProj <= 0 || prefProj > studentCount || prefRank <= 0 || prefRank > lowestRank)
+            if (prefStud <= 0 || prefStud > studentCount || prefRank <= 0 || (prefRank != tieRank && prefRank != newRank))
             {
                 error.setText("Supervisor "+QString::number(index)+" has an invalid preference");
                 error.exec();
                 data.close();
                 return false;
             }
+            if (prefRank != tieRank)
+            {
+                tieRank = newRank;
+            }
+            newRank++;
         }
     }
 
@@ -505,7 +501,7 @@ void MainWindow::on_startButton_clicked()
 
     data->close();
 
-/*    ui->startButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
 
     QFile out("out.txt");
     out.open(QIODevice::WriteOnly);
@@ -561,13 +557,11 @@ void MainWindow::on_startButton_clicked()
         i++;
     }
 
-    //out.write("\n== GENERATING INITIAL POPULATION OF ");
-    //out.write(QString::number(ui->popSizeInput->value()).toUtf8());
-    //out.write(" ==\n");
+    out.write("\n== GENERATING INITIAL POPULATION OF ");
+    out.write(QString::number(ui->popSizeInput->value()).toUtf8());
+    out.write(" ==\n");
 
-    GAInstance* spa = new GAInstance(students, projects, supervisors, ui->popSizeInput->value()); // Generate the GAInstance
-
-    //out.write(spa->getState().toLocal8Bit().data());
+    out.write(ga->getState().toLocal8Bit().data());
 
     int best = 0;
     int worst = INT_MAX;
@@ -576,10 +570,10 @@ void MainWindow::on_startButton_clicked()
     {
         ui->numberIterationsVal->setText(QString::number(i));
 
-        spa->iterateSPA();
+        ga->iterateSPA();
 
-        best = std::max(best, spa->bestFitness());
-        worst = std::min(worst, spa->worstFitness());
+        best = std::max(best, ga->bestFitness());
+        worst = std::min(worst, ga->worstFitness());
 
         ui->worstFitnessVal->setText(QString::number(worst));
         ui->bestFitnessVal->setText(QString::number(best));
@@ -587,7 +581,7 @@ void MainWindow::on_startButton_clicked()
         out.write("\n== POPULATION AFTER ");
         out.write(QString::number(i).toUtf8());
         out.write(" ITERATIONS ==\n");
-        out.write(spa->getState().toLocal8Bit().data());
+        out.write(ga->getState().toLocal8Bit().data());
         out.write("\n");
     }
 
@@ -595,7 +589,7 @@ void MainWindow::on_startButton_clicked()
 
     out.close();
 
-    ui->startButton->setEnabled(true);*/
+    ui->startButton->setEnabled(true);
 }
 
 void MainWindow::on_actionDataset_Generator_triggered()

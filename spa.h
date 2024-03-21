@@ -35,7 +35,6 @@ private:
 public:
     int getId(void);
     int getPref(int project);
-    QList<int> getGreaterPrefs(int project);
     Student(int id, PrefsMap prefs);
 };
 

@@ -69,16 +69,17 @@ int Project::getCapacity()
 QString GAInstance::getState(void)
 {
     QString ret = "";
+    int studentsCount = this->students.count();
     for (int i = 0; i < chromosomes.count(); i++)
     {
         ret.append("C");
-        ret.append(QString::number(i));
+        ret.append(QString::number(i+1));
         ret.append(" (fitness ");
         ret.append(QString::number(fitness(chromosomes[i])));
         ret.append("): ");
-        for (int j = 0; i < chromosomes[i].count(); i++)
+        for (int j = 0; j < studentsCount; j++)
         {
-            ret.append(QString::number(chromosomes[i][j]));
+            ret.append(QString::number(chromosomes[i][j]+1));
             ret.append(" ");
         }
         ret.append("\n");
@@ -143,7 +144,7 @@ void GAInstance::iterateSPA(void)
 
     // SELECTION
 
-    // Select two chromosomes in a binary tournament.
+    // Select two chromosomes for the binary tournament to decide the mother.
     int a = dist(gen);
     int b;
     int used;
@@ -152,6 +153,7 @@ void GAInstance::iterateSPA(void)
         b = dist(gen);
     } while (b == a);
 
+    // Decide the winner of the binary tournament (the mother).
     if (fitness(chromosomes[a]) >= fitness(chromosomes[b]))
     {
         mother = chromosomes[a];
@@ -163,11 +165,11 @@ void GAInstance::iterateSPA(void)
         used = b;
     }
 
-    a = used;
-    while (a == used)
+    // Now repeat this to obtain the father.
+    do
     {
         a = dist(gen);
-    }
+    } while (a == used); // Mother and father cannot be the same
     b = a;
     while (b == a || b == used)
     {
@@ -190,11 +192,15 @@ void GAInstance::iterateSPA(void)
         crosspoint2 = distStudents(gen);
     }
     if (crosspoint1 > crosspoint2) std::swap(crosspoint1, crosspoint2);
-    QMap<int, bool> usageMap1;
-    QMap<int, bool> usageMap2;
+    QMap<int, int> pUsageMap1;
+    QMap<int, int> pUsageMap2;
+    QMap<int, int> vUsageMap1;
+    QMap<int, int> vUsageMap2;
     int temp;
     int origin1Proj;
     int origin2Proj;
+    Supervisor* origin1Sup;
+    Supervisor* origin2Sup;
     QList<int> origin1;
     QList<int> origin2;
     for (int i = 0; i < studentsCount; i++)
@@ -212,19 +218,27 @@ void GAInstance::iterateSPA(void)
 
         origin1Proj = origin1[i];
         origin2Proj = origin2[i];
+        origin1Sup = (origin1Proj == -1 ? nullptr : projects[origin1[i]]->getSupervisor());
+        origin2Sup = (origin2Proj == -1 ? nullptr : projects[origin2[i]]->getSupervisor());
 
         // child 1
-        if (usageMap1[origin1Proj] == false)
+        if (origin1Proj != -1
+            && pUsageMap1[origin1Proj] < projects[origin1Proj]->getCapacity()
+            && vUsageMap1[origin1Sup->getId()] < origin1Sup->getCapacity())
         {
             child1[i] = origin1Proj;
-            usageMap1[origin1Proj] = true;
+            pUsageMap1[origin1Proj] += 1;
+            vUsageMap1[origin1Sup->getId()] += 1;
         }
         else
         {
-            if (usageMap1[origin2Proj] == false)
+            if (origin2Proj != -1
+                && pUsageMap1[origin2Proj] < projects[origin2Proj]->getCapacity()
+                && vUsageMap1[origin2Sup->getId()] < origin2Sup->getCapacity())
             {
                 child1[i] = origin2Proj;
-                usageMap1[origin2Proj] = true;
+                pUsageMap1[origin2Proj] += 1;
+                vUsageMap1[origin2Sup->getId()] += 1;
             }
             else // Just generate a new project that hasn't already been used
             {
@@ -240,17 +254,23 @@ void GAInstance::iterateSPA(void)
         }
 
         // child 2
-        if (usageMap2[origin2Proj] == false)
+        if (origin2Proj != -1
+            && pUsageMap2[origin2Proj] < projects[origin2Proj]->getCapacity()
+            && vUsageMap2[origin2Sup->getId()] < origin2Sup->getCapacity())
         {
             child2[i] = origin2Proj;
-            usageMap2[origin2Proj] = true;
+            pUsageMap2[origin2Proj] += 1;
+            vUsageMap2[origin2Sup->getId()] += 1;
         }
         else
         {
-            if (usageMap2[origin1Proj] == false)
+            if (origin1Proj != -1
+                && pUsageMap2[origin1Proj] < projects[origin1Proj]->getCapacity()
+                && vUsageMap2[origin1Sup->getId()] < origin1Sup->getCapacity())
             {
                 child2[i] = origin1Proj;
-                usageMap2[origin1Proj] = true;
+                pUsageMap2[origin1Proj] += 1;
+                vUsageMap2[origin1Sup->getId()] += 1;
             }
             else // Just generate a new project that hasn't already been used
             {
@@ -270,25 +290,40 @@ void GAInstance::iterateSPA(void)
     double mutation_rate = 1.0 / (this->chromosomes.count() * std::sqrt(this->students.count()));
     for (int i = 0; i < studentsCount; i++)
     {
+        // Todo change the loop to check for feasibility to avoid infinite loops
         if (distReals(gen) < mutation_rate)
         {
             do
             {
                 temp = distProjects(gen);
-            } while (usageMap1[temp] == true);
-            usageMap1[child1[i]] = false;
+            } while (pUsageMap1[temp] >= projects[temp]->getCapacity() &&
+                     vUsageMap1[projects[temp]->getSupervisor()->getId()] >=
+                     projects[temp]->getSupervisor()->getCapacity());
+            if (child1[i] != -1)
+            {
+                pUsageMap1[child1[i]] -= 1;
+                vUsageMap1[projects[child1[i]]->getSupervisor()->getId()] -= 1;
+            }
             child1[i] = temp;
-            usageMap1[temp] = true;
+            pUsageMap1[temp] += 1;
+            vUsageMap1[projects[temp]->getSupervisor()->getId()] += 1;
         }
         if (distReals(gen) < mutation_rate)
         {
             do
             {
                 temp = distProjects(gen);
-            } while (usageMap2[temp] == true);
-            usageMap2[child2[i]] = false;
+            } while (pUsageMap2[temp] >= projects[temp]->getCapacity() &&
+                     vUsageMap2[projects[temp]->getSupervisor()->getId()] >=
+                         projects[temp]->getSupervisor()->getCapacity());
+            if (child2[i] != -1)
+            {
+                pUsageMap2[child2[i]] -= 1;
+                vUsageMap2[projects[child2[i]]->getSupervisor()->getId()] -= 1;
+            }
             child2[i] = temp;
-            usageMap2[temp] = true;
+            pUsageMap2[temp] += 1;
+            vUsageMap2[projects[temp]->getSupervisor()->getId()] += 1;
         }
     }
 
@@ -354,9 +389,59 @@ GAInstance::GAInstance(QFile* data, int size)
     int supervisorCount = list[1].toInt();
     int projectCount = list[2].toInt();
 
-    students = QList<Student*>(studentCount);
-    supervisors = QList<Supervisor*>(supervisorCount);
-    projects = QList<Project*>(projectCount);
+    students = QList<Student*>();
+    supervisors = QList<Supervisor*>();
+    projects = QList<Project*>();
+
+    // students
+
+    for (int index = 1; index <= studentCount; index++)
+    {
+        list = QString(data->readLine()).split(u' ', Qt::SkipEmptyParts);
+        list.pop_front();
+        // Now check the preferences
+        PrefsMap prefs;
+        foreach(QString x, list)
+        {
+            QStringList pref = x.split(u':', Qt::SkipEmptyParts);
+            int prefProj = pref[0].toInt()-1;
+            int prefRank = pref[1].toInt();
+            prefs[prefProj] = prefRank;
+        }
+        students.push_back(new Student(index-1, prefs));
+    }
+
+    // supervisors
+
+    for (int index = 1; index <= supervisorCount; index++)
+    {
+        list = QString(data->readLine()).split(u' ', Qt::SkipEmptyParts);
+        QStringList v = list[0].split(u':', Qt::SkipEmptyParts);
+        int capacity = v[1].toInt();
+        list.pop_front();
+        // Now check the preferences
+        PrefsMap prefs;
+        foreach(QString x, list)
+        {
+            QStringList pref = x.split(u':', Qt::SkipEmptyParts);
+            int prefProj = pref[0].toInt()-1;
+            int prefRank = pref[1].toInt();
+            prefs[prefProj] = prefRank;
+        }
+        supervisors.push_back(new Supervisor(index-1, prefs, capacity));
+    }
+
+    // projects
+
+    for (int index = 1; index <= projectCount; index++)
+    {
+        list = QString(data->readLine()).split(u' ', Qt::SkipEmptyParts);
+        QStringList p = list[0].split(u':', Qt::SkipEmptyParts);
+        int capacity = p[1].toInt();
+        list.pop_front();
+        Supervisor* linkedV = supervisors[list[0].toInt()-1];
+        projects.push_back(new Project(index-1, linkedV, capacity));
+    }
 
     // Done making the student/supervisor/project sets, now initialise the chromosomes
 
