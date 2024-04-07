@@ -30,6 +30,10 @@ private slots:
 
     bool validateDataset(QString datasetPath);
 
+    void disableAllControls();
+
+    void enableAllControls();
+
 private:
     void freeAndClearSupervisors();
     void freeAndClearStudents();

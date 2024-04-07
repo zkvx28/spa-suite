@@ -55,20 +55,26 @@ public:
 class GAInstance
 {
 private:
-    QList<Student*> students;
-    QList<Project*> projects;
-    QList<Supervisor*> supervisors;
     QList<QList<int>> chromosomes;
     QList<int> fitnesses;
     int best;
     int worst;
+    QList<int> bestChromosome;
+    double mutation_rate;
+    int getSolutionSize(QList<int> matching);
 public:
+    QList<Student*> students;
+    QList<Project*> projects;
+    QList<Supervisor*> supervisors;
     QString getState(void);
     void iterateSPA(void);
     int bestFitness(void);
     int worstFitness(void);
     GAInstance(QFile* data, int);
     int fitness(QList<int> matching);
+    QString getBestChromosome(void);
+    void setMutationRate(double rate);
+    int bestSolutionSize(void);
 };
 
 #endif // SPA_H

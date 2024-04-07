@@ -34,287 +34,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*void MainWindow::freeAndClearSupervisors()
-{
-    ui->fnSupervisorsLabel->setText("No file loaded");
-    for(int j = 0; j < supervisors.count(); j++)
-    {
-        free(supervisors[j]);
-    }
-    supervisors.clear();
-}
-
-void MainWindow::freeAndClearStudents()
-{
-    ui->fnStudentsLabel->setText("No file loaded");
-    for(int j = 0; j < students.count(); j++)
-    {
-        free(students[j]);
-    }
-    students.clear();
-}
-
-void MainWindow::on_loadSupervisorsButton_clicked()
-{
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Text files (*.txt)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-    if (dialog.exec())
-    {
-        freeAndClearSupervisors();
-
-        fileNames = dialog.selectedFiles();
-        if (!(fileNames.empty()))
-        {
-            // Load supervisor data
-            QFile file(fileNames[0]);
-            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                return;
-
-            int i = 0;
-            while (!file.atEnd())
-            {
-                QString line = QString(file.readLine());
-                QStringList list = line.split(u' ', Qt::SkipEmptyParts);
-                if (!list.empty())
-                {
-                    QList<QString> base = list[0].split(u':', Qt::SkipEmptyParts);
-                    if (base.count() != 2)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: malformed ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    int id = base[0].toInt();
-                    if (id != i)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: incorrect ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    int capacity = base[1].toInt();
-                    if (capacity < 1)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: incorrect capacity on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    list.removeFirst();
-                    PrefsMap prefs;
-                    foreach(QString n, list)
-                    {
-                        QList<QString> cur = n.split(u':', Qt::SkipEmptyParts);
-                        if (prefs.contains(cur[0].toInt()))
-                        {
-                            QMessageBox error;
-                            error.setText("Error: duplicated prefs on line "+QString::number(i));
-                            error.exec();
-                            MainWindow::freeAndClearSupervisors();
-                            return;
-                        }
-                        if (cur[1].toInt() <= 0)
-                            prefs[cur[0].toInt()] = -1;
-                        else
-                            prefs[cur[0].toInt()] = cur[1].toInt();
-                    }
-                    supervisors.append(new Supervisor(id, prefs, capacity));
-                }
-                i++;
-            }
-
-            // Load file name into label
-            QString fnOut = fileNames[0];
-            fnOut.truncate(40);
-            fnOut.append("...");
-            ui->fnSupervisorsLabel->setText(fnOut);
-
-            // Enable projects button now supervisors loaded
-            ui->loadProjectsButton->setEnabled(true);
-
-            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
-            {
-                ui->startButton->setEnabled(true);
-                ui->cooperStartButton->setEnabled(true);
-            }
-
-            //ui->fnSupervisorsLabel->setText("Supervisors count: "+QString::number(supervisors.count()));
-        }
-    }
-}
-
-void MainWindow::on_loadStudentsButton_clicked()
-{
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Text files (*.txt)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-    if (dialog.exec())
-    {
-        MainWindow::freeAndClearStudents();
-
-        fileNames = dialog.selectedFiles();
-        if (!(fileNames.empty()))
-        {
-            // Load student data
-            QFile file(fileNames[0]);
-            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                return;
-
-            int i = 0;
-            while (!file.atEnd())
-            {
-                QString line = QString(file.readLine());
-                QStringList list = line.split(u' ', Qt::SkipEmptyParts);
-                if (!list.empty())
-                {
-                    int id = list[0].toInt();
-                    if (id != i)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: incorrect ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        MainWindow::freeAndClearStudents();
-                        return;
-                    }
-                    list.removeFirst();
-                    PrefsMap prefs;
-                    foreach(QString n, list)
-                    {
-                        QList<QString> cur = n.split(u':', Qt::SkipEmptyParts);
-                        if (prefs.contains(cur[0].toInt()))
-                        {
-                            QMessageBox error;
-                            error.setText("Error: duplicated prefs on line "+QString::number(i) + " ("+QString::number(cur[0].toInt())+")");
-                            error.exec();
-                            MainWindow::freeAndClearStudents();
-                            return;
-                        }
-                        if (cur[1].toInt() <= 0)
-                            prefs[cur[0].toInt()] = -1;
-                        else
-                            prefs[cur[0].toInt()] = cur[1].toInt();
-                    }
-                    students.append(new Student(id, prefs));
-                    prefs.clear();
-                }
-                i++;
-            }
-
-            // Load file name into label
-            QString fnOut = fileNames[0];
-            fnOut.truncate(40);
-            fnOut.append("...");
-            ui->fnStudentsLabel->setText(fnOut);
-
-            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
-            {
-                ui->startButton->setEnabled(true);
-                ui->cooperStartButton->setEnabled(true);
-            }
-        }
-    }
-}
-
-
-void MainWindow::on_loadProjectsButton_clicked()
-{
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Text files (*.txt)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-    if (dialog.exec())
-    {
-        projects.clear();
-
-        fileNames = dialog.selectedFiles();
-        if (!(fileNames.empty()))
-        {
-            // Load project data
-            QFile file(fileNames[0]);
-            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                return;
-
-            int i = 0;
-            while (!file.atEnd())
-            {
-                QString line = QString(file.readLine());
-                QStringList list = line.split(u' ', Qt::SkipEmptyParts);
-                if (!list.empty())
-                {
-                    if (list.count() != 2)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: invalid format on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        projects.clear();
-                        return;
-                    }
-                    QList<QString> base = list[0].split(u':', Qt::SkipEmptyParts);
-                    if (base.count() != 2)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: malformed ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    int id = base[0].toInt();
-                    if (id != i)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: incorrect ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    int capacity = base[1].toInt();
-                    if (capacity < 1)
-                    {
-                        QMessageBox error;
-                        error.setText("Error: incorrect capacity on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        freeAndClearSupervisors();
-                        return;
-                    }
-                    int supervisor = list[1].toInt();
-                    if ((supervisor < 0) || (supervisor > supervisors.count()))
-                    {
-                        QMessageBox error;
-                        error.setText("Error: invalid supervisor ID on line "+QString::number(i)+" ("+line+")");
-                        error.exec();
-                        projects.clear();
-                        return;
-                    }
-                    projects.append(new Project(id, supervisors[supervisor], capacity));
-                }
-                i++;
-            }
-
-            // Load file name into label
-            QString fnOut = fileNames[0];
-            fnOut.truncate(40);
-            fnOut.append("...");
-            ui->fnProjectsLabel->setText(fnOut);
-
-            if (projects.count() > 0 && students.count() > 0 && supervisors.count() > 0)
-            {
-                ui->startButton->setEnabled(true);
-                ui->cooperStartButton->setEnabled(true);
-            }
-        }
-    }
-}*/
-
 bool MainWindow::validateDataset(QString datasetPath)
 {
     QFile data(datasetPath);
@@ -497,99 +216,135 @@ void MainWindow::on_startButton_clicked()
 
     data->open(QIODevice::ReadOnly | QIODevice::Text);
 
+    ui->textBrowser->clear();
+    ui->bestFitnessVal->setText("-");
+    ui->worstFitnessVal->setText("-");
+    ui->convergenceVal->setText("-");
+    ui->bestMatchingSizeVal->setText("...");
+
     GAInstance* ga = new GAInstance(data, ui->popSizeInput->value());
+
+    ga->setMutationRate(ui->mutationRateInput->value());
 
     data->close();
 
-    ui->startButton->setEnabled(false);
+    disableAllControls();
 
     QFile out("out.txt");
-    out.open(QIODevice::WriteOnly);
 
-    out.write("=== EXECUTION BEGIN ===\n");
-
-    out.write("\n== STUDENTS LIST ==\n");
-    foreach(Student* s, students)
+    if (ui->loggingCheckBox->isChecked())
     {
-        out.write("S");
-        out.write(QString::number(s->getId()).toUtf8());
-        out.write(" PROJECT PREFS: ");
-        for (int i = 0; i < projects.count(); i++)
+        out.open(QIODevice::WriteOnly);
+
+/*        out.write("=== EXECUTION BEGIN ===\n");
+
+        out.write("\n== STUDENTS LIST ==\n");
+        foreach(Student* s, students)
         {
+            out.write("S");
+            out.write(QString::number(s->getId()).toUtf8());
+            out.write(" PROJECT PREFS: ");
+            for (int i = 0; i < projects.count(); i++)
+            {
+                out.write(QString::number(i).toUtf8());
+                out.write(":");
+                out.write(QString::number(s->getPref(i)).toUtf8());
+                out.write(" ");
+            }
+            out.write("\n");
+        }
+
+
+        out.write("\n== SUPERVISORS LIST ==\n");
+        foreach(Supervisor* v, supervisors)
+        {
+            out.write("V");
+            out.write(QString::number(v->getId()).toUtf8());
+            out.write(":");
+            out.write(QString::number(v->getCapacity()).toUtf8());
+            out.write(" STUDENT PREFS: ");
+            for (int i = 0; i < students.count(); i++)
+            {
+                out.write(QString::number(i).toUtf8());
+                out.write(":");
+                out.write(QString::number(v->getPref(i)).toUtf8());
+                out.write(" ");
+            }
+            out.write("\n");
+        }
+
+        out.write("\n== PROJECTS LIST ==\n");
+        int i = 0;
+        foreach(Project* p, projects)
+        {
+            out.write("P");
             out.write(QString::number(i).toUtf8());
             out.write(":");
-            out.write(QString::number(s->getPref(i)).toUtf8());
-            out.write(" ");
+            out.write(QString::number(p->getCapacity()).toUtf8());
+            out.write(" SUPERVISOR: ");
+            out.write(QString::number(p->getSupervisor()->getId()).toUtf8());
+            out.write("\n");
+            i++;
         }
-        out.write("\n");
+
+        out.write("\n== GENERATING INITIAL POPULATION OF ");
+        out.write(QString::number(ui->popSizeInput->value()).toUtf8());
+        out.write(" ==\n");
+
+        out.write(ga->getState().toLocal8Bit().data());*/
     }
-
-
-    out.write("\n== SUPERVISORS LIST ==\n");
-    foreach(Supervisor* v, supervisors)
-    {
-        out.write("V");
-        out.write(QString::number(v->getId()).toUtf8());
-        out.write(":");
-        out.write(QString::number(v->getCapacity()).toUtf8());
-        out.write(" STUDENT PREFS: ");
-        for (int i = 0; i < students.count(); i++)
-        {
-            out.write(QString::number(i).toUtf8());
-            out.write(":");
-            out.write(QString::number(v->getPref(i)).toUtf8());
-            out.write(" ");
-        }
-        out.write("\n");
-    }
-
-    out.write("\n== PROJECTS LIST ==\n");
-    int i = 0;
-    foreach(Project* p, projects)
-    {
-        out.write("P");
-        out.write(QString::number(i).toUtf8());
-        out.write(":");
-        out.write(QString::number(p->getCapacity()).toUtf8());
-        out.write(" SUPERVISOR: ");
-        out.write(QString::number(p->getSupervisor()->getId()).toUtf8());
-        out.write("\n");
-        i++;
-    }
-
-    out.write("\n== GENERATING INITIAL POPULATION OF ");
-    out.write(QString::number(ui->popSizeInput->value()).toUtf8());
-    out.write(" ==\n");
-
-    out.write(ga->getState().toLocal8Bit().data());
 
     int best = 0;
     int worst = INT_MAX;
 
     for (int i = 1; i <= ui->maxIterationsInput->value(); i++)
     {
-        ui->numberIterationsVal->setText(QString::number(i));
+        if (!(i % 10))
+            ui->numberIterationsVal->setText(QString::number(i));
 
         ga->iterateSPA();
 
+        if (ga->bestFitness() > best)
+        {
+            ui->textBrowser->setText(ga->getBestChromosome());
+            ui->convergenceVal->setText(QString::number(i));
+            ui->bestMatchingSizeVal->setText("Length: "+QString::number(ga->bestSolutionSize())+"/"+QString::number(ga->students.count()));
+            if (ui->loggingCheckBox->isChecked())
+            {
+                out.write(QString::number(i).toUtf8());
+                out.write(": ");
+                out.write(QString::number(ga->bestFitness()).toUtf8());
+                out.write(", size ");
+                out.write(QString::number(ga->bestSolutionSize()).toUtf8());
+                out.write("\n");
+            }
+        }
         best = std::max(best, ga->bestFitness());
         worst = std::min(worst, ga->worstFitness());
 
         ui->worstFitnessVal->setText(QString::number(worst));
         ui->bestFitnessVal->setText(QString::number(best));
+        qApp->processEvents();
 
-        out.write("\n== POPULATION AFTER ");
-        out.write(QString::number(i).toUtf8());
-        out.write(" ITERATIONS ==\n");
-        out.write(ga->getState().toLocal8Bit().data());
-        out.write("\n");
+        /*if (ui->loggingCheckBox->isChecked())
+        {
+            out.write("\n== POPULATION AFTER ");
+            out.write(QString::number(i).toUtf8());
+            out.write(" ITERATIONS ==\n");
+            out.write(ga->getState().toLocal8Bit().data());
+            out.write("\n");
+        }*/
     }
 
-    out.write("\n=== EXECUTION COMPLETE ===\n");
+    if (ui->loggingCheckBox->isChecked())
+    {
+        /*out.write(QString::number(ga->fitness(t)).toUtf8());
+        out.write("\n=== EXECUTION COMPLETE ===\n");*/
 
-    out.close();
+        out.close();
+    }
 
-    ui->startButton->setEnabled(true);
+    enableAllControls();
 }
 
 void MainWindow::on_actionDataset_Generator_triggered()
@@ -612,6 +367,7 @@ int MainWindow::getAssignableStudent(QList<int> matching, QList<int> studentPhas
 void MainWindow::on_cooperStartButton_clicked()
 {
     ui->cooperStartButton->setEnabled(false);
+    qApp->processEvents();
 
     if (!(validateDataset(datasetPath)))
     {
@@ -632,11 +388,18 @@ void MainWindow::on_cooperStartButton_clicked()
     QFile out("outCooper.txt");
     out.open(QIODevice::WriteOnly);
     out.write(model->getRawResults().toStdString().c_str());
+    out.write("\n");
+    data->seek(0);
+    GAInstance* ga = new GAInstance(data, ui->popSizeInput->value());
+    out.write(QString::number(ga->fitness(model->studentAssignments)).toUtf8());
     out.close();
+    data->seek(0);
 
     data->close();
 
-    ui->cooperStartButton->setEnabled(true);
+    delete alg;
+    delete model;
+    delete ga;
 }
 
 
@@ -666,5 +429,27 @@ void MainWindow::on_loadDatasetButton_clicked()
 
     ui->cooperStartButton->setEnabled(true);
     ui->startButton->setEnabled(true);
+}
+
+void MainWindow::disableAllControls(void)
+{
+    ui->loadDatasetButton->setEnabled(false);
+    ui->popSizeInput->setEnabled(false);
+    ui->maxIterationsInput->setEnabled(false);
+    ui->loggingCheckBox->setEnabled(false);
+    ui->startButton->setEnabled(false);
+    ui->cooperStartButton->setEnabled(false);
+    ui->mutationRateInput->setEnabled(false);
+}
+
+void MainWindow::enableAllControls(void)
+{
+    ui->loadDatasetButton->setEnabled(true);
+    ui->popSizeInput->setEnabled(true);
+    ui->maxIterationsInput->setEnabled(true);
+    ui->loggingCheckBox->setEnabled(true);
+    ui->startButton->setEnabled(true);
+    ui->cooperStartButton->setEnabled(true);
+    ui->mutationRateInput->setEnabled(true);
 }
 
