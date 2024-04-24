@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>388</width>
-    <height>469</height>
+    <height>479</height>
    </rect>
   </property>
   <property name="font">
@@ -17,7 +17,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>SPASuite ver.α</string>
+   <string>SPASuite ver.1.0.0</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">
@@ -154,7 +154,7 @@
      </rect>
     </property>
     <property name="minimum">
-     <number>8</number>
+     <number>3</number>
     </property>
     <property name="maximum">
      <number>100</number>
@@ -187,8 +187,8 @@
      <rect>
       <x>10</x>
       <y>400</y>
-      <width>80</width>
-      <height>24</height>
+      <width>0</width>
+      <height>0</height>
      </rect>
     </property>
     <property name="text">
@@ -359,6 +359,29 @@
      <string>...</string>
     </property>
    </widget>
+   <zorder>cooperStartButton</zorder>
+   <zorder>startButton</zorder>
+   <zorder>numberIterationsLabel</zorder>
+   <zorder>numberIterationsVal</zorder>
+   <zorder>bestFitnessLabel</zorder>
+   <zorder>bestFitnessVal</zorder>
+   <zorder>worstFitnessLabel</zorder>
+   <zorder>worstFitnessVal</zorder>
+   <zorder>popSizeLabel</zorder>
+   <zorder>maxIterationsLabel</zorder>
+   <zorder>popSizeInput</zorder>
+   <zorder>maxIterationsInput</zorder>
+   <zorder>loadDatasetButton</zorder>
+   <zorder>fnDatasetLabel</zorder>
+   <zorder>bestMatchingLabel</zorder>
+   <zorder>textBrowser</zorder>
+   <zorder>loggingLabel</zorder>
+   <zorder>loggingCheckBox</zorder>
+   <zorder>convergenceLabel</zorder>
+   <zorder>convergenceVal</zorder>
+   <zorder>mutationRateInput</zorder>
+   <zorder>mutationRateLabel</zorder>
+   <zorder>bestMatchingSizeVal</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -366,7 +389,7 @@
      <x>0</x>
      <y>0</y>
      <width>388</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDataset_Generator">

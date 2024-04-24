@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>417</width>
+    <width>462</width>
     <height>280</height>
    </rect>
   </property>
@@ -46,7 +46,7 @@
   <widget class="QSpinBox" name="numStudentsVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>10</y>
      <width>81</width>
      <height>21</height>
@@ -78,7 +78,7 @@
   <widget class="QSpinBox" name="numSupervisorsVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>40</y>
      <width>81</width>
      <height>21</height>
@@ -110,7 +110,7 @@
   <widget class="QSpinBox" name="numProjectsVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>70</y>
      <width>81</width>
      <height>21</height>
@@ -129,7 +129,7 @@
   <widget class="QDoubleSpinBox" name="incompletenessVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>100</y>
      <width>81</width>
      <height>21</height>
@@ -161,7 +161,7 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>289</x>
+     <x>330</x>
      <y>250</y>
      <width>111</width>
      <height>21</height>
@@ -187,7 +187,7 @@
   <widget class="QDoubleSpinBox" name="tiesVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>130</y>
      <width>81</width>
      <height>21</height>
@@ -208,7 +208,7 @@
     <rect>
      <x>20</x>
      <y>160</y>
-     <width>161</width>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -219,7 +219,7 @@
   <widget class="QSpinBox" name="maxCapacityVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>160</y>
      <width>81</width>
      <height>21</height>
@@ -240,7 +240,7 @@
     <rect>
      <x>20</x>
      <y>190</y>
-     <width>161</width>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -253,7 +253,7 @@
     <rect>
      <x>20</x>
      <y>220</y>
-     <width>161</width>
+     <width>201</width>
      <height>21</height>
     </rect>
    </property>
@@ -264,7 +264,7 @@
   <widget class="QSpinBox" name="studentMaxPrefVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>190</y>
      <width>81</width>
      <height>21</height>
@@ -283,7 +283,7 @@
   <widget class="QSpinBox" name="supervisorMaxPrefVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>220</y>
      <width>81</width>
      <height>21</height>
@@ -302,7 +302,7 @@
   <widget class="QSpinBox" name="numDatasetsVal">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>230</x>
      <y>250</y>
      <width>81</width>
      <height>21</height>
@@ -334,7 +334,7 @@
   <widget class="QLabel" name="stepLabel1">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>320</x>
      <y>10</y>
      <width>41</width>
      <height>21</height>
@@ -347,7 +347,7 @@
   <widget class="QLabel" name="stepLabel2">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>320</x>
      <y>40</y>
      <width>41</width>
      <height>21</height>
@@ -360,7 +360,7 @@
   <widget class="QLabel" name="stepLabel3">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>320</x>
      <y>70</y>
      <width>41</width>
      <height>21</height>
@@ -373,7 +373,7 @@
   <widget class="QSpinBox" name="studentsStepVal">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>360</x>
      <y>10</y>
      <width>81</width>
      <height>21</height>
@@ -392,7 +392,7 @@
   <widget class="QSpinBox" name="supervisorsStepVal">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>360</x>
      <y>40</y>
      <width>81</width>
      <height>21</height>
@@ -411,7 +411,7 @@
   <widget class="QSpinBox" name="projectsStepVal">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>360</x>
      <y>70</y>
      <width>81</width>
      <height>21</height>
@@ -430,7 +430,7 @@
   <widget class="QDoubleSpinBox" name="tiesStepVal">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>360</x>
      <y>130</y>
      <width>81</width>
      <height>21</height>
@@ -449,7 +449,7 @@
   <widget class="QLabel" name="stepLabel4">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>320</x>
      <y>130</y>
      <width>41</width>
      <height>21</height>
@@ -462,7 +462,7 @@
   <widget class="QLabel" name="stepLabel5">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>320</x>
      <y>160</y>
      <width>41</width>
      <height>21</height>
@@ -475,7 +475,7 @@
   <widget class="QSpinBox" name="capacityStepVal">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>360</x>
      <y>160</y>
      <width>81</width>
      <height>21</height>

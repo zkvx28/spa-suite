@@ -222,6 +222,10 @@ void MainWindow::on_startButton_clicked()
     ui->convergenceVal->setText("-");
     ui->bestMatchingSizeVal->setText("...");
 
+    typedef std::chrono::high_resolution_clock Clock;
+
+    Clock::time_point startTime = Clock::now();
+
     GAInstance* ga = new GAInstance(data, ui->popSizeInput->value());
 
     ga->setMutationRate(ui->mutationRateInput->value());
@@ -340,6 +344,12 @@ void MainWindow::on_startButton_clicked()
     {
         /*out.write(QString::number(ga->fitness(t)).toUtf8());
         out.write("\n=== EXECUTION COMPLETE ===\n");*/
+        out.write("\nExecuted in ");
+        std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - startTime);
+        out.write(QString::number(duration.count() / 1000).toUtf8());
+        out.write(".");
+        out.write(QString::number(duration.count() % 1000).toUtf8());
+        out.write("s\n");
 
         out.close();
     }
