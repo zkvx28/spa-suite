@@ -39,6 +39,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Number of students (also number of genes in chromosome)</string>
+   </property>
    <property name="text">
     <string>Number of students</string>
    </property>
@@ -71,6 +74,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Number of supervisors</string>
+   </property>
    <property name="text">
     <string>Number of supervisors</string>
    </property>
@@ -102,6 +108,9 @@
      <width>161</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Number of projects</string>
    </property>
    <property name="text">
     <string>Number of projects</string>
@@ -154,6 +163,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>The probability to skip assigning a project</string>
+   </property>
    <property name="text">
     <string>Rate of incompleteness</string>
    </property>
@@ -179,6 +191,9 @@
      <width>161</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>The probability that a project will be equal preference to the previous assignment</string>
    </property>
    <property name="text">
     <string>Rate of ties</string>
@@ -212,6 +227,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>The maximum capacity that projects and supervisors may have</string>
+   </property>
    <property name="text">
     <string>Maximum potential capacity</string>
    </property>
@@ -244,6 +262,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Maximum preferences a student may have</string>
+   </property>
    <property name="text">
     <string>Max. preferences (students)</string>
    </property>
@@ -256,6 +277,9 @@
      <width>201</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Maximum preferences a supervisor may have</string>
    </property>
    <property name="text">
     <string>Max. preferences (supervisors)</string>
@@ -326,6 +350,9 @@
      <width>81</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>The number of datasets to generate</string>
    </property>
    <property name="text">
     <string>To generate:</string>
@@ -489,6 +516,38 @@
    </property>
    <property name="value">
     <number>0</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="stepLabel5_2">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>100</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Step</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="incompletenessStepVal">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>100</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <double>1.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
+   </property>
+   <property name="value">
+    <double>0.000000000000000</double>
    </property>
   </widget>
  </widget>

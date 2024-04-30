@@ -7,6 +7,8 @@
 
 Supervisor::Supervisor(int id, PrefsMap prefs, int capacity)
 {
+    Q_ASSERT(id >= 0);
+    Q_ASSERT(capacity > 0);
     this->id = id;
     this->prefs = prefs;
     this->capacity = capacity;
@@ -31,6 +33,7 @@ int Supervisor::getPref(int student)
 
 Student::Student(int id, PrefsMap prefs)
 {
+    Q_ASSERT(id >= 0);
     this->id = id;
     this->prefs = prefs;
 }
@@ -49,6 +52,9 @@ int Student::getPref(int project)
 
 Project::Project(int id, Supervisor* supervisor, int capacity)
 {
+    Q_ASSERT(id >= 0);
+    Q_ASSERT(supervisor != nullptr);
+    Q_ASSERT(capacity > 0);
     this->id = id;
     this->supervisor = supervisor;
     this->capacity = capacity;
@@ -621,6 +627,13 @@ GAInstance::GAInstance(QFile* data, int size)
         chromosomes.push_back(chromosome);
         fitnesses.push_back(fitness(chromosome));
     }
+
+    Q_ASSERT(students.count() > 0);
+    Q_ASSERT(supervisors.count() > 0);
+    Q_ASSERT(projects.count() > 0);
+    Q_ASSERT(chromosomes.count() > 0);
+    Q_ASSERT(fitnesses.count() > 0);
+
 }
 
 QString GAInstance::getBestChromosome(void)

@@ -207,6 +207,8 @@ bool MainWindow::validateDataset(QString datasetPath)
 
 void MainWindow::on_startButton_clicked()
 {
+    Q_ASSERT(datasetPath != nullptr);
+
     // Load dataset
 
     if (!(validateDataset(datasetPath)))
@@ -229,6 +231,8 @@ void MainWindow::on_startButton_clicked()
     GAInstance* ga = new GAInstance(data, ui->popSizeInput->value());
 
     ga->setMutationRate(ui->mutationRateInput->value());
+
+    Q_ASSERT(ga->bestFitness() == INT_MIN);
 
     data->close();
 
@@ -429,8 +433,11 @@ void MainWindow::on_loadDatasetButton_clicked()
         {
             // Load file name into label
             QString fnOut = fileNames[0];
-            fnOut = fnOut.last(40);
-            fnOut.prepend("...");
+            if (fnOut.length() > 38)
+            {
+                fnOut = fnOut.last(38);
+                fnOut.prepend("...");
+            }
             ui->fnDatasetLabel->setText(fnOut);
             // Load file name into datasetPath
             datasetPath = fileNames[0];

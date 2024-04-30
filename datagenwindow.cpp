@@ -33,8 +33,6 @@ void DataGenWindow::on_pushButton_clicked()
         return;
     }*/
 
-    double incomplete = ui->incompletenessVal->value();
-
     // Select save location
     QString dirName = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                                                          "/home",
@@ -45,6 +43,7 @@ void DataGenWindow::on_pushButton_clicked()
         int students = ui->numStudentsVal->value() + ((z-1) * ui->studentsStepVal->value());
         int supervisors = ui->numSupervisorsVal->value() + ((z-1) * ui->supervisorsStepVal->value());
         int projects = ui->numProjectsVal->value() + ((z-1) * ui->projectsStepVal->value());
+        double incomplete = (ui->incompletenessVal->value() + (ui->incompletenessStepVal->value() * (z-1))) > 1.0 ? 1.0 : ui->incompletenessVal->value() + (ui->incompletenessStepVal->value() * (z-1));
         double ties = (ui->tiesVal->value() + (ui->tiesStepVal->value() * (z-1))) > 1.0 ? 1.0 : ui->tiesVal->value() + (ui->tiesStepVal->value() * (z-1));
 
         std::mt19937 gen(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));

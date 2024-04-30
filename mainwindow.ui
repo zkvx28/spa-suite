@@ -49,6 +49,9 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Iterations passed</string>
+    </property>
     <property name="text">
      <string>Number of iterations</string>
     </property>
@@ -74,6 +77,9 @@
       <width>181</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Fitness of the best solution so far</string>
     </property>
     <property name="text">
      <string>Best fitness:</string>
@@ -101,6 +107,9 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Fitness of the worst solution so far</string>
+    </property>
     <property name="text">
      <string>Worst fitness:</string>
     </property>
@@ -127,6 +136,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Number of chromosomes in the population</string>
+    </property>
     <property name="text">
      <string>Population size</string>
     </property>
@@ -139,6 +151,9 @@
       <width>181</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Number of iterations before termination</string>
     </property>
     <property name="text">
      <string>Maximum iterations</string>
@@ -230,6 +245,9 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>The best matching found and its length</string>
+    </property>
     <property name="text">
      <string>Best matching found:</string>
     </property>
@@ -258,6 +276,9 @@
       <width>181</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Outputted to out.txt in the executable directory</string>
     </property>
     <property name="text">
      <string>Logging</string>
@@ -294,8 +315,11 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>The number of iterations until the last time a best solution was found</string>
+    </property>
     <property name="text">
-     <string>Iterations until convergence:</string>
+     <string>Iterations until last change</string>
     </property>
    </widget>
    <widget class="QLabel" name="convergenceVal">
@@ -341,6 +365,9 @@
       <width>181</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>The probability of mutating a gene</string>
     </property>
     <property name="text">
      <string>Mutation rate</string>
